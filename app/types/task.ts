@@ -14,6 +14,14 @@ export enum TaskPriority {
   Urgent = "urgent",
 }
 
+/** Supported task types after normalization. */
+export enum TaskType {
+  Image = "image",
+  Audio = "audio",
+  Text = "text",
+  Unknown = "unknown",
+}
+
 /** Fields supported for client-side and server-side sorting. */
 export enum SortField {
   Title = "title",
@@ -50,21 +58,33 @@ export interface Tag {
   readonly color?: string;
 }
 
-/** Core task entity used across UI, store, cache, and real-time sync. */
+/** Core task entity used across UI, Redux, cache and real-time updates. */
 export interface Task {
   readonly id: string;
+
   title: string;
-  description: string;
+  description?: string;
+
+  type: TaskType;
+
   status: TaskStatus;
   priority: TaskPriority;
+
   assignee: Assignee | null;
+
+  annotationCount: number;
+
   tags: readonly Tag[];
+
   dueDate: string | null;
+
+  meta: Record<string, unknown>;
+
   readonly createdAt: string;
   updatedAt: string;
 }
 
-/** AI summary content associated with a single task. */
+/** AI summary associated with a task. */
 export interface TaskAiSummary {
   readonly taskId: string;
   content: string;
@@ -73,7 +93,7 @@ export interface TaskAiSummary {
   errorMessage: string | null;
 }
 
-/** Client-side filter criteria applied to a task collection. */
+/** Client-side filter criteria. */
 export interface TaskFilters {
   search: string;
   statuses: readonly TaskStatus[];
@@ -84,19 +104,19 @@ export interface TaskFilters {
   dueAfter: string | null;
 }
 
-/** Sort configuration for task lists. */
+/** Sort configuration. */
 export interface TaskSort {
   field: SortField;
   order: SortOrder;
 }
 
-/** Pagination input for list queries. */
+/** Pagination request. */
 export interface PaginationParams {
   page: number;
   pageSize: number;
 }
 
-/** Pagination metadata returned with list results. */
+/** Pagination metadata. */
 export interface PaginationMeta {
   page: number;
   pageSize: number;
@@ -106,22 +126,21 @@ export interface PaginationMeta {
   hasPreviousPage: boolean;
 }
 
-/** Paginated task list result. */
+/** Paginated task collection. */
 export interface PaginatedTasks {
   items: readonly Task[];
   meta: PaginationMeta;
 }
 
 /**
- * Normalized task collection shape.
- * Supports O(1) lookups and stable list ordering for Redux and IndexedDB layers.
+ * Normalized Redux/IndexedDB collection.
  */
 export interface NormalizedTaskCollection {
   entities: Readonly<Record<string, Task>>;
   ids: readonly string[];
 }
 
-/** Default empty filter state for initialization. */
+/** Default filters. */
 export const DEFAULT_TASK_FILTERS: TaskFilters = {
   search: "",
   statuses: [],
@@ -132,13 +151,13 @@ export const DEFAULT_TASK_FILTERS: TaskFilters = {
   dueAfter: null,
 };
 
-/** Default sort: most recently updated first. */
+/** Default sorting. */
 export const DEFAULT_TASK_SORT: TaskSort = {
   field: SortField.UpdatedAt,
   order: SortOrder.Desc,
 };
 
-/** Default pagination for task list requests. */
+/** Default pagination. */
 export const DEFAULT_PAGINATION_PARAMS: PaginationParams = {
   page: 1,
   pageSize: 20,

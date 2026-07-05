@@ -20,8 +20,8 @@ import {
 /**
  * Entity adapter keeps tasks normalized.
  */
-export const tasksAdapter = createEntityAdapter<Task>({
-  selectId: (task) => task.id,
+export const tasksAdapter = createEntityAdapter<Task, string>({
+  selectId: (task: Task) => task.id,
 
   sortComparer: (a, b) =>
     new Date(b.updatedAt).getTime() -
@@ -90,7 +90,13 @@ export const tasksSlice = createSlice({
     },
 
     setFilters(state, action: PayloadAction<TaskFilters>) {
-      state.filters = action.payload;
+      state.filters = {
+        ...action.payload,
+        statuses: [...action.payload.statuses],
+        priorities: [...action.payload.priorities],
+        assigneeIds: [...action.payload.assigneeIds],
+        tagIds: [...action.payload.tagIds],
+      };
     },
 
     setSort(state, action: PayloadAction<TaskSort>) {

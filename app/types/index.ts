@@ -55,6 +55,7 @@ export {
   SummaryStatus,
   TaskPriority,
   TaskStatus,
+  TaskType,
 } from "./task";
 
 export type {
